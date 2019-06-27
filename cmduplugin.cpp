@@ -237,10 +237,17 @@ QString CMDUPlugin::BS(long b)
 QString CMDUPlugin::NB(long b)
 {
     QString s = "";
-    if(b>999){
-        s = QString("%1").arg(b/1024, 5, 'f', 0, QLatin1Char(' ')) + "KB";
+    if(b > 999000) {
+        float m_per = float(b)/1024/1024;
+        if (m_per >= 10)
+            s = QString("%1").arg(int(m_per), 3) + "M";
+        else
+            s = QString("%1").arg(m_per, 3, 'f', 1) + "M";
+    }
+    else if(b > 999){
+        s = QString("%1").arg(b/1024, 3) + "K";
     }else{
-        s = QString("%1").arg(0, 5, 'f', 0, QLatin1Char(' ')) + "KB";
+        s = QString("%1").arg(b, 3) + "B";
     }
     return s;
 }
@@ -314,12 +321,13 @@ void CMDUPlugin::updateCMDU()
     if (i > 0) {
         long ds = dbt1 - dbt0;
         long us = ubt1 - ubt0;
-        dss = NB(ds) + "/s";
-        uss = NB(us) + "/s";
+        dss = NB(ds);
+        uss = NB(us);
         dbt0 = dbt1;
         ubt0 = ubt1;
     }
     QString netspeed = "↑" + uss + "\n↓" + dss;
+//    QString netspeed = uss + "\n" + dss;
     QString net = "UPB: " + BS(ubt1) + "  " + uss + "\nDNB: " + BS(dbt1) + "  " + dss;
 
     i++;
